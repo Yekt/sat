@@ -2,17 +2,42 @@ import math
 
 
 def main():
-    n = 9
-    n_sub = int(math.sqrt(n))
 
+    ### READING INPUT FILE ###
+    with open ("bsp-sudoku-input.txt", "r") as input:
+        raw = input.read().split('\n')
+
+    # trimm raw data
+    del raw[:5]
+    del raw[-1:]
+    sudoku = []
+    for line in raw:
+        if not line.startswith("+") and line is not "":
+            data = line.replace("| ", "").replace(" |", "").split(" ")
+            while "" in data:
+                data.remove("")
+            sudoku.append(data)
+    print(sudoku)
+
+    # calculate n
+    n = len(sudoku)
+    n_sub = int(math.sqrt(n))
+    print(n)
+
+    # fill grid
+    grid = [["-" for x in range(n)] for y in range(n)]
+    for x in range(0, n):
+        for y in range(0, n):
+            if not sudoku[x][y].startswith("_"):
+                grid[x][y] = int(sudoku[x][y])
+    #print_grid(grid)
+
+
+
+    ### CONVERTING GRID TO CNF ###
     # those should be calculated
     nv = 999
     nc = 11979
-
-    grid = [["-" for x in range(n)] for y in range(n)]
-
-    setup_sudoku(grid)
-    print_grid(grid)
 
     f = open('sudo.cnf', 'w')
     f.write("p cnf " + str(nv) + " " + str(nc) + "\n")
@@ -111,8 +136,8 @@ def main():
                 nc += 1
 
     f.close()
-    print_file()
-    print("nc is " + str(nc))
+    #print_file()
+    #print("nc is " + str(nc))
 
 
 # convert coordinate with number to variable
@@ -123,7 +148,8 @@ def ctv(x, y, z):
 def print_grid(grid):
     for x in grid:
         for y in x:
-            print(y, end=' ')
+            end= ' '
+            print(y, end)
         print()
 
 
@@ -132,52 +158,6 @@ def print_file():
     f = open('sudo.cnf', 'r')
     print(f.read())
     f.close()
-
-
-def setup_sudoku(grid):
-    grid[0][2] = 4
-    grid[0][3] = 2
-    grid[0][4] = 3
-    grid[0][5] = 9
-    grid[1][1] = 8
-    grid[1][3] = 5
-    grid[1][5] = 6
-
-    grid[2][0] = 9
-    grid[2][3] = 8
-    grid[2][5] = 4
-    grid[2][7] = 6
-
-    grid[3][0] = 5
-    grid[3][1] = 7
-    grid[3][2] = 1
-    grid[3][6] = 9
-    grid[3][7] = 4
-    grid[3][8] = 6
-    grid[4][0] = 8
-    grid[4][8] = 3
-
-    grid[5][0] = 2
-    grid[5][1] = 3
-    grid[5][2] = 9
-    grid[5][6] = 7
-    grid[5][7] = 8
-    grid[5][8] = 1
-
-    grid[6][3] = 4
-    grid[6][5] = 8
-    grid[6][8] = 7
-    grid[7][2] = 3
-    grid[7][3] = 9
-    grid[7][5] = 7
-    grid[7][7] = 1
-
-    grid[8][3] = 1
-    grid[8][4] = 2
-    grid[8][5] = 3
-    grid[8][6] = 4
-
-
 
 
 if __name__ == '__main__':
