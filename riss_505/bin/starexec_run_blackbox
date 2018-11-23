@@ -1,0 +1,3 @@
+#!/bin/bash
+
+./riss -auto -checkModel $1
