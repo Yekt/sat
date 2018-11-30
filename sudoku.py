@@ -1,4 +1,5 @@
 import math
+import subprocess
 
 
 def main():
@@ -17,12 +18,11 @@ def main():
             while "" in data:
                 data.remove("")
             sudoku.append(data)
-    print(sudoku)
 
     # calculate n
     n = len(sudoku)
     n_sub = int(math.sqrt(n))
-    print(n)
+    print('Sudoku size is %sx%s' % (n, n))
 
     # fill grid
     grid = [["-" for x in range(n)] for y in range(n)]
@@ -30,7 +30,6 @@ def main():
         for y in range(0, n):
             if not sudoku[x][y].startswith("_"):
                 grid[x][y] = int(sudoku[x][y])
-    #print_grid(grid)
 
 
 
@@ -136,8 +135,16 @@ def main():
                 nc += 1
 
     f.close()
-    #print_file()
-    #print("nc is " + str(nc))
+
+
+
+    ### RUN RISS AND CATCH stdout ###
+    riss = subprocess.Popen("./riss_505/bin/riss sudo.cnf", stdout=subprocess.PIPE, shell=True)
+
+    (output, error) = riss.communicate()
+    status = riss.wait()
+    print(output)
+    print(status, error)
 
 
 # convert coordinate with number to variable
