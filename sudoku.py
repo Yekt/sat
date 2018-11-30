@@ -31,21 +31,22 @@ def main():
         for y in range(0, n):
             if not sudoku[x][y].startswith("_"):
                 grid[x][y] = int(sudoku[x][y])
+    print(grid)
 
 
 
     ### CONVERTING GRID TO CNF ###
-    # TODO those should be calculated
-    nv = (n+1)*(n+1)*(n+1) - 1
+    nv = int(str(n)*3)
     nc = 0
     content = ''
 
+    # TODO fix cnf algorithm for sudokus larger than 9x9
     # EACH ENTRY
 
     # AT LEAST ONE NUMBER
     for x in range(1, n+1):
         for y in range(1, n+1):
-            for z in range(1, 10):
+            for z in range(1, n+1):
                 content += ctv(x, y, z, n_len) + ' '
             content += "0\n"
             nc += 1
@@ -53,8 +54,8 @@ def main():
     # AT MOST ONE NUMBER
     for x in range(1, n+1):
         for y in range(1, n+1):
-            for z in range(1, 9):
-                for i in range(z+1, 10):
+            for z in range(1, n):
+                for i in range(z+1, n+1):
                     content += "-" + ctv(x, y, z, n_len) + " " + "-" + ctv(x, y, i, n_len) + " 0\n"
                     nc += 1
 
@@ -62,7 +63,7 @@ def main():
 
     # EACH NUMBER AT MOST ONCE
     for y in range(1, n+1):
-        for z in range(1, 10):
+        for z in range(1, n+1):
             for x in range(1, n):
                 for i in range(x+1, n+1):
                     content += "-" + ctv(x, y, z, n_len) + " " + "-" + ctv(i, y, z, n_len) + " 0\n"
@@ -70,7 +71,7 @@ def main():
 
     # EACH NUMBER AT LEAST ONCE
     for y in range(1, n+1):
-        for z in range(1, 10):
+        for z in range(1, n+1):
             for x in range(1, n+1):
                 content += ctv(x, y, z, n_len) + ' '
             content += "0\n"
@@ -80,7 +81,7 @@ def main():
 
     # EACH NUMBER AT MOST ONCE
     for x in range(1, n + 1):
-        for z in range(1, 10):
+        for z in range(1, n+1):
             for y in range(1, n):
                 for i in range(y + 1, n + 1):
                     content += "-" + ctv(x, y, z, n_len) + " " + "-" + ctv(x, i, z, n_len) + " 0\n"
@@ -88,7 +89,7 @@ def main():
 
     # EACH NUMBER AT LEAST ONCE
     for x in range(1, n+1):
-        for z in range(1, 10):
+        for z in range(1, n+1):
             for y in range(1, n+1):
                 content += ctv(x, y, z, n_len) + ' '
             content += "0\n"
@@ -97,7 +98,7 @@ def main():
     # SUB-GRID
 
     # EACH NUMBER AT MOST ONCE
-    for z in range(1, 10):
+    for z in range(1, n+1):
         for i in range(0, n_sub):
             for j in range(0, n_sub):
                 for x in range(1, n_sub+1):
@@ -106,7 +107,7 @@ def main():
                             content += "-" + ctv((3*i + x), (3*j + y), z, n_len) + " -" + ctv((3*i+x), (3*j+k), z, n_len) + " 0\n"
                             nc += 1
 
-    for z in range(1, 10):
+    for z in range(1, n+1):
         for i in range(0, n_sub):
             for j in range(0, n_sub):
                 for x in range(1, n_sub+1):
@@ -132,7 +133,7 @@ def main():
             if grid[x][y] != "-":
                 content += ctv(x+1, y+1, grid[x][y], n_len) + " 0\n"
                 nc += 1
-                
+
     f = open('sudo.cnf', 'w')
     f.write("p cnf " + str(nv) + " " + str(nc) + "\n")
     f.write(content)
@@ -145,6 +146,7 @@ def main():
     # might be optimizable
     (output, error) = riss.communicate()
     status = riss.wait()
+    #print(output)
 
 
 
