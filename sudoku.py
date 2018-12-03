@@ -18,6 +18,7 @@ def main():
             while "" in data:
                 data.remove("")
             sudoku.append(data)
+    print("data read")
 
     # calculate n
     n = len(sudoku)
@@ -31,83 +32,102 @@ def main():
         for y in range(0, n):
             if not sudoku[x][y].startswith("_"):
                 grid[x][y] = int(sudoku[x][y])
-    #print(grid)
+    print("grid filled")
 
 
 
     ### CONVERTING GRID TO CNF ###
     nv = int(str(n)*3)
     nc = 0
-    content = ''
 
-    # TODO fix cnf algorithm for sudokus larger than 9x9
     # EACH ENTRY
 
     # AT LEAST ONE NUMBER
+    c1 = ''
     for x in range(1, n+1):
         for y in range(1, n+1):
             for z in range(1, n+1):
-                content += ctv(x, y, z, n_len) + ' '
-            content += "0\n"
+                c1 += ctv(x, y, z, n_len) + ' '
+            c1 += "0\n"
             nc += 1
+    print('EACH ENTRY, at least one number: done')
 
     # AT MOST ONE NUMBER
+    c2 = ''
     for x in range(1, n+1):
         for y in range(1, n+1):
             for z in range(1, n):
                 for i in range(z+1, n+1):
-                    content += "-" + ctv(x, y, z, n_len) + " " + "-" + ctv(x, y, i, n_len) + " 0\n"
+                    c2 += "-" + ctv(x, y, z, n_len) + " " + "-" + ctv(x, y, i, n_len) + " 0\n"
                     nc += 1
+        print('row done: '+ str(x))
+    print('EACH ENTRY, at most one number: done')
 
     # EACH ROW
 
     # EACH NUMBER AT MOST ONCE
+    c3 = ''
     for x in range(1, n + 1):
         for z in range(1, n+1):
             for y in range(1, n):
                 for i in range(y + 1, n + 1):
-                    content += "-" + ctv(x, y, z, n_len) + " " + "-" + ctv(x, i, z, n_len) + " 0\n"
+                    c3 += "-" + ctv(x, y, z, n_len) + " " + "-" + ctv(x, i, z, n_len) + " 0\n"
                     nc += 1
+        print('row done: '+ str(x))
+    print('EACH ROW, each number at most once: done')
 
     # EACH NUMBER AT LEAST ONCE
+    c4 = ''
     for x in range(1, n+1):
         for z in range(1, n+1):
             for y in range(1, n+1):
-                content += ctv(x, y, z, n_len) + ' '
-            content += "0\n"
+                c4 += ctv(x, y, z, n_len) + ' '
+            c4 += "0\n"
             nc += 1
+        print('row done: '+ str(x))
+    print('EACH ROW, each number at least once: done')
 
 
     # EACH COLUMN
 
     # EACH NUMBER AT MOST ONCE
+    c5 = ''
     for y in range(1, n+1):
         for z in range(1, n+1):
             for x in range(1, n):
                 for i in range(x+1, n+1):
-                    content += "-" + ctv(x, y, z, n_len) + " " + "-" + ctv(i, y, z, n_len) + " 0\n"
+                    c5 += "-" + ctv(x, y, z, n_len) + " " + "-" + ctv(i, y, z, n_len) + " 0\n"
                     nc += 1
+        print('column done: '+ str(y))
+    print('EACH COLUMN, each number at most once: done')
 
     # EACH NUMBER AT LEAST ONCE
+    c6 = ''
     for y in range(1, n+1):
         for z in range(1, n+1):
             for x in range(1, n+1):
-                content += ctv(x, y, z, n_len) + ' '
-            content += "0\n"
+                c6 += ctv(x, y, z, n_len) + ' '
+            c6 += "0\n"
             nc += 1
+        print('column done: '+ str(y))
+    print('EACH COLUMN, each number at least once: done')
 
     # SUB-GRID
 
     # EACH NUMBER AT MOST ONCE
+    c7 = ''
     for z in range(1, n+1):
         for i in range(0, n_sub):
             for j in range(0, n_sub):
                 for x in range(1, n_sub+1):
                     for y in range(1, n_sub+1):
                         for k in range(y+1, n_sub+1):
-                            content += "-" + ctv((n_sub*i + x), (n_sub*j + y), z, n_len) + " -" + ctv((n_sub*i+x), (n_sub*j+k), z, n_len) + " 0\n"
+                            c7 += "-" + ctv((n_sub*i + x), (n_sub*j + y), z, n_len) + " -" + ctv((n_sub*i+x), (n_sub*j+k), z, n_len) + " 0\n"
                             nc += 1
+        print('number done: '+ str(z))
+    print('SUB-GRID, each number at most once (1): done')
 
+    c8 = ''
     for z in range(1, n+1):
         for i in range(0, n_sub):
             for j in range(0, n_sub):
@@ -115,30 +135,48 @@ def main():
                     for y in range(1, n_sub+1):
                         for k in range(x+1, n_sub+1):
                             for l in range(1, n_sub+1):
-                                content += "-" + ctv((n_sub*i + x), (n_sub*j + y), z, n_len) + " -" + ctv((n_sub*i+k), (n_sub*j+l), z, n_len) + " 0\n"
+                                c8 += "-" + ctv((n_sub*i + x), (n_sub*j + y), z, n_len) + " -" + ctv((n_sub*i+k), (n_sub*j+l), z, n_len) + " 0\n"
                                 nc += 1
+        print('number done: '+ str(z))
+    print('SUB-GRID, each number at most once (2): done')
 
     # EACH NUMBER AT LEAST ONCE
+    c9 = ''
     for i in range(1, n_sub):
         for j in range(1, n_sub):
             for x in range(1, n_sub+1):
                 for y in range(1, n_sub+1):
                     for z in range(1, n+1):
-                        content += ctv((n_sub*i+x), (n_sub*j+y), z, n_len) + " "
-                    content += "0\n"
+                        c9 += ctv((n_sub*i+x), (n_sub*j+y), z, n_len) + " "
+                    c9 += "0\n"
                     nc += 1
+        print('number done: '+ str(i))
+    print('SUB-GRID, each number at least once: done')
 
     # SET EXISTING NUMBERS
+    c0 = ''
     for x in range(n):
         for y in range(n):
             if grid[x][y] != "-":
-                content += ctv(x+1, y+1, grid[x][y], n_len) + " 0\n"
+                c0 += ctv(x+1, y+1, grid[x][y], n_len) + " 0\n"
                 nc += 1
+        print('row done: '+str(x))
+    print('SET EXISTING NUMBERS: done')
 
     f = open('sudo.cnf', 'w')
     f.write("p cnf " + str(nv) + " " + str(nc) + "\n")
-    f.write(content)
+    f.write(c1)
+    f.write(c2)
+    f.write(c3)
+    f.write(c4)
+    f.write(c5)
+    f.write(c6)
+    f.write(c7)
+    f.write(c8)
+    f.write(c9)
+    f.write(c0)
     f.close()
+    print("cnf written")
 
 
 
@@ -148,6 +186,7 @@ def main():
     (output, error) = riss.communicate()
     status = riss.wait()
     print(output)
+    #print('RISS Ccompleted')
 
 
 
@@ -166,6 +205,7 @@ def main():
             x = int(value) -1
             grid[x][y] = z
             if x==0 and y==0: finished = True
+    print('grid completed')
 
 
 
@@ -186,14 +226,16 @@ def main():
             for block_horizontal in range(0,n_sub):
                 for col in range(0,n_sub):
                     z = grid[x][y]
+                    txt.write(' ' * (n_len - len(z)))
                     txt.write(z)
-                    txt.write(' ' * len(z))
+                    txt.write(' ')
                     y += 1
                 txt.write('| ')
             txt.write('\n')
             x += 1
         txt.write(spacer(n_sub, n_len))
     txt.close()
+    print('done')
 
 
 
