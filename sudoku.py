@@ -31,7 +31,7 @@ def main():
         for y in range(0, n):
             if not sudoku[x][y].startswith("_"):
                 grid[x][y] = int(sudoku[x][y])
-    print(grid)
+    #print(grid)
 
 
 
@@ -62,24 +62,6 @@ def main():
     # EACH ROW
 
     # EACH NUMBER AT MOST ONCE
-    for y in range(1, n+1):
-        for z in range(1, n+1):
-            for x in range(1, n):
-                for i in range(x+1, n+1):
-                    content += "-" + ctv(x, y, z, n_len) + " " + "-" + ctv(i, y, z, n_len) + " 0\n"
-                    nc += 1
-
-    # EACH NUMBER AT LEAST ONCE
-    for y in range(1, n+1):
-        for z in range(1, n+1):
-            for x in range(1, n+1):
-                content += ctv(x, y, z, n_len) + ' '
-            content += "0\n"
-            nc += 1
-
-    # EACH COLUMN
-
-    # EACH NUMBER AT MOST ONCE
     for x in range(1, n + 1):
         for z in range(1, n+1):
             for y in range(1, n):
@@ -95,6 +77,25 @@ def main():
             content += "0\n"
             nc += 1
 
+
+    # EACH COLUMN
+
+    # EACH NUMBER AT MOST ONCE
+    for y in range(1, n+1):
+        for z in range(1, n+1):
+            for x in range(1, n):
+                for i in range(x+1, n+1):
+                    content += "-" + ctv(x, y, z, n_len) + " " + "-" + ctv(i, y, z, n_len) + " 0\n"
+                    nc += 1
+
+    # EACH NUMBER AT LEAST ONCE
+    for y in range(1, n+1):
+        for z in range(1, n+1):
+            for x in range(1, n+1):
+                content += ctv(x, y, z, n_len) + ' '
+            content += "0\n"
+            nc += 1
+
     # SUB-GRID
 
     # EACH NUMBER AT MOST ONCE
@@ -104,7 +105,7 @@ def main():
                 for x in range(1, n_sub+1):
                     for y in range(1, n_sub+1):
                         for k in range(y+1, n_sub+1):
-                            content += "-" + ctv((3*i + x), (3*j + y), z, n_len) + " -" + ctv((3*i+x), (3*j+k), z, n_len) + " 0\n"
+                            content += "-" + ctv((n_sub*i + x), (n_sub*j + y), z, n_len) + " -" + ctv((n_sub*i+x), (n_sub*j+k), z, n_len) + " 0\n"
                             nc += 1
 
     for z in range(1, n+1):
@@ -114,7 +115,7 @@ def main():
                     for y in range(1, n_sub+1):
                         for k in range(x+1, n_sub+1):
                             for l in range(1, n_sub+1):
-                                content += "-" + ctv((3*i + x), (3*j + y), z, n_len) + " -" + ctv((3*i+k), (3*j+l), z, n_len) + " 0\n"
+                                content += "-" + ctv((n_sub*i + x), (n_sub*j + y), z, n_len) + " -" + ctv((n_sub*i+k), (n_sub*j+l), z, n_len) + " 0\n"
                                 nc += 1
 
     # EACH NUMBER AT LEAST ONCE
@@ -123,7 +124,7 @@ def main():
             for x in range(1, n_sub+1):
                 for y in range(1, n_sub+1):
                     for z in range(1, n+1):
-                        content += ctv((3*i+x), (3*j+y), z, n_len) + " "
+                        content += ctv((n_sub*i+x), (n_sub*j+y), z, n_len) + " "
                     content += "0\n"
                     nc += 1
 
@@ -146,7 +147,7 @@ def main():
     # might be optimizable
     (output, error) = riss.communicate()
     status = riss.wait()
-    #print(output)
+    print(output)
 
 
 
