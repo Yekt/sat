@@ -15,18 +15,18 @@ def main():
 
     for name in sudokus:
         cnf_creator.create_cnf(name)
-    checkpoint = time.time()-start
-    print('\nFINISHED CREATING ALL CNF FILES, time needed: ' + str(checkpoint))
-    print('--------------------------------------------------------------\n')
+    checkpoint = time.time()
+    print('\nFINISHED CREATING ALL CNF FILES, time needed: ' + str( round(checkpoint-start, 3))) + 's'
+    print('-------------------------------------------------------\n')
 
 
     pool = Pool(processes = multiprocessing.cpu_count())
     pool.map(output_creator.create_output, sudokus)
     pool.close()
     pool.join()
-    print('\nFINISHED CREATING ALL OUTPUT FILES, time needed: ' + str(time.time()-checkpoint))
-    print('==============================================================\n')
-    print('ALL SUDOKUS HAVE BEEN SOLVED, total time was: ' + str(time.time()-start))
+    print('\nFINISHED CREATING ALL OUTPUT FILES, time needed: ' + str( round(time.time()-checkpoint, 3))) + 's'
+    print('=======================================================\n')
+    print('ALL SUDOKUS HAVE BEEN SOLVED, total time was: ' + str( round( time.time()-start, 3))) + 's\n'
 
 
 if __name__ == '__main__':

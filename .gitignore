@@ -2,3 +2,9 @@
 output\.txt
 
 sudo\.cnf
+
+*.pyc
+
+outputs/
+
+cnf/

@@ -61,7 +61,7 @@ def create_output(name='-bsp'):
     txt.write(out)
     txt.close()
 
-    print('table'+name+' output was created, total time: '+ str(time.time()-start))
+    print('table'+name+' output was created, in ' + str( round(time.time()-start, 3))) + 's'
 
 
 # creates a spacer for the final sudoku with correct width
