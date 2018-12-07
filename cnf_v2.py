@@ -38,7 +38,6 @@ def create_cnf(name='-bsp'):
             if not sudoku[x][y].startswith('_'):
                 grid[x][y] = int(sudoku[x][y])
                 nc += 1
-    print(nc, nv)
 
     # create all cnf clauses and write file TODO optimze
     manager = mp.Manager()
@@ -56,7 +55,7 @@ def create_cnf(name='-bsp'):
     pool.map_async(p3, range(1,n+1))
     p4 = partial(constraint4, q, n_sub, n_len)
     pool.map_async(p4, range(1,n+1))
-    p5 = partial(constraint5, q, n_sub, n_len)
+    p5 = partial(constraint5, q, n, n_sub, n_len)
     pool.map_async(p5, range(1,n+1))
     if extendedCNF:
         p6 = partial(constraint6, q, n, n_len)
@@ -75,7 +74,6 @@ def create_cnf(name='-bsp'):
                 clauses += ctv(x+1, y+1, grid[x][y], n_len) + " 0\n"
     q.put(clauses)
 
-    q.put('done')
     pool.close()
     pool.join()
 
@@ -86,12 +84,16 @@ def create_cnf(name='-bsp'):
 def writer(name, nv, nc, q):
     cnf = open('./cnf/table'+name+'.cnf', 'w')
     cnf.write("p cnf " + str(nv) + " " + str(nc) + '\n')
-    clause = q.get()
-    while not clause == 'done':
-        print(clause)
-        cnf.write(clause)
+    while True:
         clause = q.get()
+        if clause == 'done':
+            break
+        cnf.write(clause)
     cnf.close()
+
+
+def foo(q, n, n_sub, n_len):
+    pass
 
 
 def constraint1(q, n, n_len, x):
@@ -102,7 +104,6 @@ def constraint1(q, n, n_len, x):
             clauses += ctv(x, y, z, n_len) + ' '
         clauses += "0\n"
     q.put(clauses)
-    print('1 - '+x)
 def constraint2(q, n, n_len, x):
     # EACH ROW, each number at most once
     clauses = ''
@@ -111,7 +112,6 @@ def constraint2(q, n, n_len, x):
             for i in range(y + 1, n + 1):
                 clauses += "-" + ctv(x, y, z, n_len) + " " + "-" + ctv(x, i, z, n_len) + " 0\n"
     q.put(clauses)
-    print('2 - '+x)
 def constraint3(q, n, n_len, y):
     # EACH COLUMN, each number at most once
     clauses = ''
@@ -120,7 +120,6 @@ def constraint3(q, n, n_len, y):
             for i in range(x+1, n+1):
                 clauses += "-" + ctv(x, y, z, n_len) + " " + "-" + ctv(i, y, z, n_len) + " 0\n"
     q.put(clauses)
-    print('3 - '+y)
 def constraint4(q, n_sub, n_len, z):
     # SUB-GRID, each number at most once (1)
     clauses = ''
@@ -131,8 +130,7 @@ def constraint4(q, n_sub, n_len, z):
                     for k in range(y+1, n_sub+1):
                         clauses += "-" + ctv((n_sub*i + x), (n_sub*j + y), z, n_len) + " -" + ctv((n_sub*i+x), (n_sub*j+k), z, n_len) + " 0\n"
     q.put(clauses)
-    print('4 - '+z)
-def constraint5(q, n_sub, n_len, z):
+def constraint5(q, n, n_sub, n_len, z):
     # SUB-GRID, each number at most once (2)
     clauses = ''
     for i in range(0, n_sub):
@@ -143,7 +141,8 @@ def constraint5(q, n_sub, n_len, z):
                         for l in range(1, n_sub+1):
                             clauses += "-" + ctv((n_sub*i + x), (n_sub*j + y), z, n_len) + " -" + ctv((n_sub*i+k), (n_sub*j+l), z, n_len) + " 0\n"
     q.put(clauses)
-    print('5 - '+z)
+    if not extendedCNF and z == n:
+        q.put('done')
 
 def constraint6(q, n, n_len, x):
     # EACH ENTRY, at most one number
@@ -153,7 +152,6 @@ def constraint6(q, n, n_len, x):
             for i in range(z+1, n+1):
                 clauses += "-" + ctv(x, y, z, n_len) + " " + "-" + ctv(x, y, i, n_len) + " 0\n"
     q.put(clauses)
-    print('6 - '+x)
 def constraint7(q, n, n_len, x):
     # EACH ROW, each number at least once
     clauses = ''
@@ -162,7 +160,6 @@ def constraint7(q, n, n_len, x):
             clauses += ctv(x, y, z, n_len) + ' '
         clauses += "0\n"
     q.put(clauses)
-    print('7 - '+x)
 def constraint8(q, n, n_len, y):
     # EACH COLUMN, each number at least once
     clauses = ''
@@ -171,7 +168,6 @@ def constraint8(q, n, n_len, y):
             clauses += ctv(x, y, z, n_len) + ' '
         clauses += "0\n"
     q.put(clauses)
-    print('8 - '+y)
 def constraint9(q, n, n_sub, n_len, i):
     # SUB-GRID, each number at least once
     clauses = ''
@@ -182,7 +178,8 @@ def constraint9(q, n, n_sub, n_len, i):
                     clauses += ctv((n_sub*i+x), (n_sub*j+y), z, n_len) + " "
                 clauses += "0\n"
     q.put(clauses)
-    print('9 - '+i)
+    if i == n_sub-1:
+        q.put('done')
 
 
 # convert coordinate with number to variable and fill with leading zeros

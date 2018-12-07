@@ -11,7 +11,6 @@ def create_output(name='-bsp'):
     status = riss.wait()
 
 
-
     # complete grid from riss output
     result = output.split(' ')
     del result[-1:]
