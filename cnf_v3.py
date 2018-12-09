@@ -25,10 +25,10 @@ def create_cnf(name='-bsp'):
     n_len = len(str(n))
     nv = int(str(n)*3)
     nc = 0
-#    if extendedCNF:
-#        nc = int(4*n*n + 4*n*n*bc(n,2))
-#    else:
-#        nc =int(n*n + 3*n*n*bc(n,2))
+    if extendedCNF:
+        nc = int(4*n*n + 4*n*n*bc(n,2))
+    else:
+        nc =int(n*n + 3*n*n*bc(n,2))
 
     # fill grid
     grid = [['-' for x in range(n)] for y in range(n)]
@@ -36,6 +36,7 @@ def create_cnf(name='-bsp'):
         for y in range(0, n):
             if not sudoku[x][y].startswith('_'):
                 grid[x][y] = int(sudoku[x][y])
+                nc += 1
 
 
     # create all cnf clauses and write to file TODO optimze
@@ -47,27 +48,24 @@ def create_cnf(name='-bsp'):
             for z in range(1, n+1):
                 clauses += ctv(x, y, z, n_len) + ' '
             clauses += "0\n"
-            nc += 1
+            #nc += 1
     cnf.write(clauses)
-    #print(1)
     clauses = ''  # EACH ROW, each number at most once
     for x in range(1, n + 1):
         for z in range(1, n+1):
             for y in range(1, n):
                 for i in range(y + 1, n + 1):
                     clauses += "-" + ctv(x, y, z, n_len) + " " + "-" + ctv(x, i, z, n_len) + " 0\n"
-                    nc += 1
+                    #nc += 1
     cnf.write(clauses)
-    #print(2)
     clauses = ''  # EACH COLUMN, each number at most once
     for y in range(1, n+1):
         for z in range(1, n+1):
             for x in range(1, n):
                 for i in range(x+1, n+1):
                     clauses += "-" + ctv(x, y, z, n_len) + " " + "-" + ctv(i, y, z, n_len) + " 0\n"
-                    nc += 1
+                    #nc += 1
     cnf.write(clauses)
-    #print(3)
     clauses = ''  # SUB-GRID, each number at most once (1)
     for z in range(1, n+1):
         for i in range(0, n_sub):
@@ -76,9 +74,8 @@ def create_cnf(name='-bsp'):
                     for y in range(1, n_sub+1):
                         for k in range(y+1, n_sub+1):
                             clauses += "-" + ctv((n_sub*i + x), (n_sub*j + y), z, n_len) + " -" + ctv((n_sub*i+x), (n_sub*j+k), z, n_len) + " 0\n"
-                            nc += 1
+                            #nc += 1
     cnf.write(clauses)
-    #print(4)
     clauses = ''  # SUB-GRID, each number at most once (2)
     for z in range(1, n+1):
         for i in range(0, n_sub):
@@ -88,17 +85,15 @@ def create_cnf(name='-bsp'):
                         for k in range(x+1, n_sub+1):
                             for l in range(1, n_sub+1):
                                 clauses += "-" + ctv((n_sub*i + x), (n_sub*j + y), z, n_len) + " -" + ctv((n_sub*i+k), (n_sub*j+l), z, n_len) + " 0\n"
-                                nc += 1
+                                #nc += 1
     cnf.write(clauses)
-    #print(5)
     clauses = ''  # SET EXISTING NUMBERS
     for x in range(n):
         for y in range(n):
             if grid[x][y] != "-":
                 clauses += ctv(x+1, y+1, grid[x][y], n_len) + " 0\n"
-                nc += 1
+                #nc += 1
     cnf.write(clauses)
-    #print(6)
 
     if extendedCNF:
         clauses = ''  # EACH ENTRY, at most one number
@@ -107,27 +102,24 @@ def create_cnf(name='-bsp'):
                 for z in range(1, n):
                     for i in range(z+1, n+1):
                         clauses += "-" + ctv(x, y, z, n_len) + " " + "-" + ctv(x, y, i, n_len) + " 0\n"
-                        nc += 1
+                        #nc += 1
         cnf.write(clauses)
-        #print(7)
         clauses = ''  # EACH ROW, each number at least once
         for x in range(1, n+1):
             for z in range(1, n+1):
                 for y in range(1, n+1):
                     clauses += ctv(x, y, z, n_len) + ' '
                 clauses += "0\n"
-                nc += 1
+                #nc += 1
         cnf.write(clauses)
-        #print(8)
         clauses = ''  # EACH COLUMN, each number at least once
         for y in range(1, n+1):
             for z in range(1, n+1):
                 for x in range(1, n+1):
                     clauses += ctv(x, y, z, n_len) + ' '
                 clauses += "0\n"
-                nc += 1
+                #nc += 1
         cnf.write(clauses)
-        #print(9)
         clauses = ''  # SUB-GRID, each number at least once
         for i in range(1, n_sub):
             for j in range(1, n_sub):
@@ -136,9 +128,8 @@ def create_cnf(name='-bsp'):
                         for z in range(1, n+1):
                             clauses += ctv((n_sub*i+x), (n_sub*j+y), z, n_len) + " "
                         clauses += "0\n"
-                        nc += 1
+                        #nc += 1
         cnf.write(clauses)
-        #print(10)
 
     cnf.write("p cnf " + str(nv) + " " + str(nc))
     cnf.close()

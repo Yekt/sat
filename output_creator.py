@@ -5,11 +5,9 @@ import subprocess
 def create_output(name='-bsp'):
     start = time.time()
 
-    # run riss TODO optimizable?
+    # run riss
     riss = subprocess.Popen('./riss_505/bin/riss ./cnf/table'+name+'.cnf', stdout=subprocess.PIPE, shell=True)
     (output, error) = riss.communicate()
-    status = riss.wait()
-
 
     # complete grid from riss output
     result = output.split(' ')
@@ -33,14 +31,49 @@ def create_output(name='-bsp'):
             grid[x][y] = z
             if x==0 and y==0: finished = True
 
+
+    # test finished sudoku
+    check = 'CORRECT'
+    for x in range(0,n):
+        nbrs = []
+        for y in range(0,n):
+            nbrs.append(int(grid[x][y]))
+        nbrs.sort()
+        if nbrs != range(1,n+1):
+            check = 'ERROR'
+    for y in range(0,n):
+        nbrs = []
+        for x in range(0,n):
+            nbrs.append(int(grid[x][y]))
+        nbrs.sort()
+        if nbrs != range(1,n+1):
+            check = 'ERROR'
+    for i in range(0,n_sub):
+        for j in range(0,n_sub):
+            nbrs = []
+            for x in range(0,n_sub):
+                xpos = i*n_sub + x
+                for y in range(0,n_sub):
+                    ypos = j*n_sub + y
+                    nbrs.append(int(grid[xpos][ypos]))
+            nbrs.sort()
+            if nbrs != range(1,n+1):
+                check = 'ERROR'
+    for j in range(0,n_sub):
+        for i in range(0,n_sub):
+            nbrs = []
+            for x in range(0,n_sub):
+                xpos = i*n_sub + x
+                for y in range(0,n_sub):
+                    ypos = j*n_sub + y
+                    nbrs.append(int(grid[xpos][ypos]))
+            nbrs.sort()
+            if nbrs != range(1,n+1):
+                check = 'ERROR'
+
+
     # creating output txt
-    # TODO missing information:
-        #experiment: generator (Time: 0.001419 s)
-        #number of tasks: 1
-        #task: 1
-        #puzzle size: 3x3
-    out = ''
-    out += spacer(n_sub, n_len)
+    out = spacer(n_sub, n_len)
     x = 0
     for block_vertical in range(0,n_sub):
         for row in range(0,n_sub):
@@ -56,11 +89,11 @@ def create_output(name='-bsp'):
             out += '\n'
             x += 1
         out += spacer(n_sub, n_len)
-    txt = open('./outputs/table'+name+'.txt', 'w')
-    txt.write(out)
+    txt = open('./outputs/result'+name+'.txt', 'a')
+    txt.write('puzzle size: ' + str(n_sub) + 'x' + str(n_sub) + '\n' + out)
     txt.close()
 
-    print('table'+name+' output was created, in ' + str( round(time.time()-start, 3))) + 's'
+    print(check + ' table'+name+' output was created, in ' + str( round(time.time()-start, 3))) + 's'
 
 
 # creates a spacer for the final sudoku with correct width
