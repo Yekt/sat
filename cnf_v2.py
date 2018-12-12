@@ -92,10 +92,6 @@ def writer(name, nv, nc, q):
     cnf.close()
 
 
-def foo(q, n, n_sub, n_len):
-    pass
-
-
 def constraint1(q, n, n_len, x):
     # EACH ENTRY, at least one number
     clauses = ''

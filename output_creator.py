@@ -32,60 +32,20 @@ def create_output(name='-bsp'):
             if x==0 and y==0: finished = True
 
 
-    # test finished sudoku
-    check = 'CORRECT'
-    for x in range(0,n):
-        nbrs = []
-        for y in range(0,n):
-            nbrs.append(int(grid[x][y]))
-        nbrs.sort()
-        if nbrs != range(1,n+1):
-            check = 'ERROR'
-    for y in range(0,n):
-        nbrs = []
-        for x in range(0,n):
-            nbrs.append(int(grid[x][y]))
-        nbrs.sort()
-        if nbrs != range(1,n+1):
-            check = 'ERROR'
-    for i in range(0,n_sub):
-        for j in range(0,n_sub):
-            nbrs = []
-            for x in range(0,n_sub):
-                xpos = i*n_sub + x
-                for y in range(0,n_sub):
-                    ypos = j*n_sub + y
-                    nbrs.append(int(grid[xpos][ypos]))
-            nbrs.sort()
-            if nbrs != range(1,n+1):
-                check = 'ERROR'
-    for j in range(0,n_sub):
-        for i in range(0,n_sub):
-            nbrs = []
-            for x in range(0,n_sub):
-                xpos = i*n_sub + x
-                for y in range(0,n_sub):
-                    ypos = j*n_sub + y
-                    nbrs.append(int(grid[xpos][ypos]))
-            nbrs.sort()
-            if nbrs != range(1,n+1):
-                check = 'ERROR'
-
-
     # creating output txt
     out = spacer(n_sub, n_len)
     x = 0
     for block_vertical in range(0,n_sub):
         for row in range(0,n_sub):
-            out += '| '
+            out += '|'
             y = 0
             for block_horizontal in range(0,n_sub):
                 for col in range(0,n_sub):
                     z = grid[x][y]
-                    out += ' ' * (n_len - len(z))
-                    out += z + ' '
+                    out += ' ' * (n_len - len(z) + 1)
+                    out += z
                     y += 1
-                out += '| '
+                out += ' |'
             out += '\n'
             x += 1
         out += spacer(n_sub, n_len)
@@ -93,7 +53,7 @@ def create_output(name='-bsp'):
     txt.write('puzzle size: ' + str(n_sub) + 'x' + str(n_sub) + '\n' + out)
     txt.close()
 
-    print(check + ' table'+name+' output was created, in ' + str( round(time.time()-start, 3))) + 's'
+    print(' table'+name+' output was created, in ' + str( round(time.time()-start, 3))) + 's'
 
 
 # creates a spacer for the final sudoku with correct width

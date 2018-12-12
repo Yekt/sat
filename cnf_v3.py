@@ -39,7 +39,7 @@ def create_cnf(name='-bsp'):
                 nc += 1
 
 
-    # create all cnf clauses and write to file TODO optimze
+    # create all cnf clauses and write to file
     cnf = open('./cnf/table'+name+'.cnf', 'w')
 
     clauses = ''  # EACH ENTRY, at least one number
